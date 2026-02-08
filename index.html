@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Birthday Cake 🎂</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      #mainTitle {
+        font-size: 32px;
+        font-family: 'Pixelify Sans', sans-serif;
+        margin-bottom: 8px;
+      }
+
+      #subTitle {
+        font-size: 18px;
+        font-family: 'Pixelify Sans', sans-serif;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="birthdayText"></div>
+      <div class="cake-container">
+        <div class="cake" id="cake"></div>
+      </div>
+    </div>
+
+    <script>
+      // Read URL params
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get("name") || "Loya";
+      let candleCount = parseInt(params.get("candles")) || 23;
+      candleCount = Math.min(Math.max(candleCount, 1), 30);
+
+      const birthdayText = document.getElementById("birthdayText");
+      birthdayText.innerHTML = `
+        <div id="mainTitle">Happy Birthday, ${name}!</div>
+        <div id="subTitle">Make a wish and blow candles.</div>
+      `;
+
+      const cake = document.getElementById("cake");
+
+      const colors = [
+        "green-candle",
+        "purple-candle",
+        "blue-candle",
+        "yellow-candle",
+      ];
+      const CAKE_VISUAL_WIDTH = 35;
+
+      function createCandles(count) {
+        cake.innerHTML = "";
+        const CANDLE_VISUAL_WIDTH = 2;
+        const availableWidth = CAKE_VISUAL_WIDTH;
+        const candlesPerRow = 6;
+        const rowCount = Math.ceil(count / candlesPerRow);
+        const shiftAmount = 4;
+
+        for (let i = 0; i < count; i++) {
+          const candle = document.createElement("div");
+          candle.classList.add("candle");
+          const colorClass = colors[Math.floor(Math.random() * colors.length)];
+          candle.classList.add(colorClass);
+
+          const row = Math.floor(i / candlesPerRow);
+          const col = i % candlesPerRow;
+          const totalCandlesInRow = Math.min(
+            candlesPerRow,
+            count - row * candlesPerRow
+          );
+          const rowSpacing = availableWidth / (totalCandlesInRow + 1);
+
+          const leftBase = rowSpacing * (col + 1) - CANDLE_VISUAL_WIDTH / 2 + 5;
+          const rowShift = row % 2 === 0 ? 0 : shiftAmount;
+
+          candle.style.position = "absolute";
+          candle.style.top = `${10 + row * 3}px`;
+          candle.style.left = `${leftBase - rowShift + 4}px`;
+
+          cake.appendChild(candle);
+        }
+      }
+
+      createCandles(candleCount);
+
+      // === Blow / Relight Cycle (custom timings) ===
+      // First blow at 15s after load, stay off for 20s, then relight and repeat.
+      const FIRST_BLOW_MS = 15000;
+      const OFF_DURATION_MS = 20000;
+
+      function blowOutCandles() {
+        const candles = document.querySelectorAll(".candle");
+        candles.forEach((candle) => {
+          const delay = Math.random() * 1000;
+          setTimeout(() => {
+            candle.classList.add("blown");
+          }, delay);
+        });
+
+        // subtitle while candles are blown
+        setTimeout(() => {
+          const subTitle = document.getElementById("subTitle");
+          subTitle.textContent = `Yayy! Wishing you the happiest birthday ever!! 🎉`;
+        }, 1200);
+      }
+
+      // Kick off the recurring cycle. Uses recursion to avoid overlapping intervals.
+      let blowTimeoutId = null;
+      let relightTimeoutId = null;
+
+      function startBlowCycle() {
+        // schedule blow after 15s
+        blowTimeoutId = setTimeout(() => {
+          blowOutCandles();
+
+          // stay off for OFF_DURATION_MS, then relight and restart cycle
+          relightTimeoutId = setTimeout(() => {
+            createCandles(candleCount); // recreates lit candles
+            const subTitle = document.getElementById("subTitle");
+            subTitle.textContent = `Make a wish and blow candles.`;
+            // restart cycle (next blow will occur after FIRST_BLOW_MS)
+            startBlowCycle();
+          }, OFF_DURATION_MS);
+        }, FIRST_BLOW_MS);
+      }
+
+      // Start the cycle once initial candles are rendered
+      startBlowCycle();
+    </script>
+    <div id="heart-container" aria-hidden="true"></div>
+
+    <!-- Using flattened duplicates for consistent blending. Originals kept as fallbacks. -->
+    <img src="Pictures/duplicates/IMG_0177_flat.png" alt="decorative badge" class="corner-badge br" aria-hidden="true" onerror="this.onerror=null;this.src='Pictures/IMG_0177.png'">
+    <img src="Pictures/duplicates/IMG_0177_flat.png" alt="decorative badge" class="corner-badge tr" aria-hidden="true" onerror="this.onerror=null;this.src='Pictures/IMG_0177.png'">
+    <img src="Pictures/duplicates/IMG_01772_flat.png" alt="decorative badge" class="corner-badge bl" aria-hidden="true" onerror="this.onerror=null;this.src='Pictures/IMG_01772.png'">
+    <img src="Pictures/duplicates/IMG_01772_flat.png" alt="decorative badge" class="corner-badge tl" aria-hidden="true" onerror="this.onerror=null;this.src='Pictures/IMG_01772.png'">
+
+    <script>
+      (function() {
+        const container = document.getElementById('heart-container');
+
+        function spawnHeart() {
+          const heart = document.createElement('div');
+          heart.className = 'heart';
+
+          const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+          const size = Math.floor(Math.random() * 12) + 12; // 12-24px
+          heart.style.width = size + 'px';
+          heart.style.height = size + 'px';
+          heart.style.setProperty('--s', (size / 18).toFixed(2));
+
+          const leftPct = Math.random() * 100;
+          heart.style.left = leftPct + '%';
+
+          const duration = (Math.random() * 4) + 5; // 5-9s fall
+          heart.style.animation = `fall ${duration}s linear forwards`;
+
+          // small horizontal drift and rotation
+          const dx = (Math.random() - 0.5) * 200; // -100px..100px drift
+          const r = (Math.random() - 0.5) * 120; // rotation variance
+          heart.style.setProperty('--dx', dx + 'px');
+          heart.style.setProperty('--r', r + 'deg');
+
+          container.appendChild(heart);
+
+          heart.addEventListener('animationend', () => heart.remove());
+        }
+
+        // spawn hearts continuously; lower interval for lighter effect
+        const interval = 350; // ms
+        const spawnInterval = setInterval(spawnHeart, interval);
+
+        // keep running indefinitely; cleanup if page is hidden
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) clearInterval(spawnInterval);
+        });
+      })();
+    </script>
+  </body>
+</html>
